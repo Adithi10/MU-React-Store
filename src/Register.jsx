@@ -1,49 +1,68 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import { useState, useContext } from "react";
 import { AppContext } from "./App";
-import { useRef } from "react";
 export default function Register() {
   const [user, setUser] = useState({});
-  const Navigate = useNavigate();
+  const Navigate = useNavigate()
   const { users, setUsers } = useContext(AppContext);
-  const nameRef = useRef();
-  const emailRef = useRef();
-  const passRef = useRef();
-  const handleSubmit = () => {
-    const userObj = {
-      name: nameRef.current.value,
-      email: emailRef.current.value,
-      pass: passRef.current.value,
-    };
-    // setUsers([...users, user]);
-    setUsers([...users, userObj]);
+ const handleSubmit = async () => {
+  try {
+    const res = await fetch("http://localhost:8080/users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(user),
+    });
+    const data = await res.json();
+    console.log("User registered:", data);
     Navigate("/login");
+  } catch (err) {
+    console.error("Registration failed", err);
+  }
+};
+
+  const [count, setCount] = useState(0);
+  const [dic, setDic] = useState(0);
+  const [a,setA] = useState(0);
+  const [b,setB] = useState(0);
+  
+  const [result,setResult] = useState()
+  const sum = () => {
+    setResult(Number(a) + Number(b))
+  }
+
+  const updateDic = () => {
+    setDic(dic + 1);
   };
-  return (
+
+  const reduceDic = () => {
+    setDic(dic - 1);
+  };
+
+  const updateCount = () => {
+    setCount(count + 1);
+  };
+   return (
     <div>
       <h2>Register</h2>
       <p>
         <input
           type="text"
           placeholder="Enter Name"
-          ref={nameRef}
-          // onChange={(e) => setUser({ ...user, name: e.target.value })}
+          onChange={(e) => setUser({ ...user, name: e.target.value })}
         />
       </p>
       <p>
         <input
           type="text"
-          ref={emailRef}
-          // onChange={(e) => setUser({ ...user, email: e.target.value })}
+          onChange={(e) => setUser({ ...user, email: e.target.value })}
           placeholder="Enter Email Address"
         />
       </p>
       <p>
         <input
           type="password"
-          ref={passRef}
-          // onChange={(e) => setUser({ ...user, pass: e.target.value })}
+          onChange={(e) => setUser({ ...user, pass: e.target.value })}
           placeholder="New Password"
         />
       </p>
@@ -52,8 +71,27 @@ export default function Register() {
       </p>
       <hr />
       <p>
-        <Link to="/login">Aready a member? Login Here...</Link>
+        <Link to="/login">Already a member? Login Here...</Link>
       </p>
+<hr />
+      <p>
+        {count}<br></br>
+        <button onClick={updateCount}>Update Count</button>
+      </p>
+      <p>
+        {dic}<br></br>
+        <button onClick={updateDic}> + </button>
+        <button onClick={reduceDic}> - </button>
+      </p>
+
+<p>
+  <input type="number" onChange={(e) => setA(e.target.value)}/>
+  <input type="number" onChange={(e) => setB(e.target.value)}/>
+  <button onClick={sum}> ADD </button>
+</p>
+<p>
+  {result}
+</p>
     </div>
   );
 }
